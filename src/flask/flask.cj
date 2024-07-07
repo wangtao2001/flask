@@ -31,17 +31,19 @@ public class Flask {
             if (perfix != "/") {
                 name = requestPath[perfix.size..]
             }
-            if (!routerGroup.getRouters().contains(name)) {
-                continue
-            }   
-            if (!routerGroup.getRouters()[name].contains(requestMethod)) {
-                return FuncHandler{
-                    context => 
-                    context.responseBuilder.status(HttpStatusCode.STATUS_METHOD_NOT_ALLOWED)
-                    println("405")
-                }.handle(context)
+            match(routerGroup.matchRouter(name)) {
+                case Some(path) => 
+                    print("${path}\t")
+                    if (!routerGroup.getRouters()[path].contains(requestMethod)) {
+                        return FuncHandler{
+                            context => 
+                            context.responseBuilder.status(HttpStatusCode.STATUS_METHOD_NOT_ALLOWED)
+                            println("405")
+                        }.handle(context)
+                    }
+                    return routerGroup.getRouters()[path][requestMethod].handle(context)
+                case None => ""
             }
-            return routerGroup.getRouters()[name][requestMethod].handle(context)
         }
 
         return FuncHandler{
@@ -56,12 +58,12 @@ public class Flask {
         this.server.serve()
     }
 
-    public func get(path: String, handler: () -> String) {
+    public func get(path: String, handler: Handler) {
         let default = this.addRouerGroup("/")
         default.get(path, handler)
     }
 
-    public func post(path: String, handler: () -> String) {
+    public func post(path: String, handler: Handler) {
         let default =  this.addRouerGroup("/")
         default.post(path, handler)
     }

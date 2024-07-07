@@ -2,6 +2,8 @@ package flask
 
 from net import http.FuncHandler
 
+type Handler = (BaseContext)->Unit
+
 public class RouterGroup {
     private let perfix: String
     private let routers: HashMap<String, HashMap<String, HttpRequestHandler>>
@@ -23,14 +25,36 @@ public class RouterGroup {
         this.routers
     }
 
-    private func addRouters(name: String, method: String, handler: ()->String) {
+    public func matchRouter(name: String): ?String {
+        let nameRange = name.split("/", removeEmpty: true)
+        for ((path, _) in this.routers) {
+            let pathRange = path.split("/", removeEmpty: true)
+            if (nameRange.size != pathRange.size) {
+                continue
+            }
+            var isMatch = true
+            for (idx in 0..nameRange.size) {
+                if (nameRange[idx] != pathRange[idx] && pathRange[idx] != "*" && !pathRange[idx].startsWith(":") ) {
+                    isMatch = false
+                    break
+                }
+            }
+            if (isMatch) {
+                return Some(path)
+            }
+        }
+        return None
+    }
+
+    private func addRouters(name: String, method: String, handler: Handler) {
         var path = name
         if (!path.startsWith("/")) {
             path = "/" + path
         }
         let httpHandler = FuncHandler {
-            context => handler() |> context.responseBuilder.body
+            context => 
             println("200")
+            handler(BaseContext(context))
         }
         if (!this.routers.contains(name)) {
             this.routers[name] = HashMap<String, HttpRequestHandler>([(method, httpHandler)])
@@ -39,11 +63,11 @@ public class RouterGroup {
         }
     }
 
-    public func get(name: String, handler: ()->String) {
+    public func get(name: String, handler: Handler) {
         this.addRouters(name, "GET", handler)
     }
 
-    public func post(name: String, handler: ()->String) {
+    public func post(name: String, handler: Handler) {
         this.addRouters(name, "POST", handler)
     }
 }
