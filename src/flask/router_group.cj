@@ -70,4 +70,28 @@ public class RouterGroup {
     public func post(name: String, handler: Handler) {
         this.addRouters(name, "POST", handler)
     }
+
+    public func static_(path: String, folder: String) {
+        var name = path
+        if (!path.startsWith("/")) {
+            name = "/" + path
+        }
+        if (name.endsWith("/")) {
+            name += "*"
+        } else {
+            name += "/*"
+        }
+        this.addRouters(name, "GET") {
+            context =>
+            var filePath = context.getRequestPath()
+            if (path != "/") {
+                let filePath = filePath[path.size..]
+            }
+            if (folder.endsWith("/")) {
+                context.file(folder + filePath)
+            } else {
+                context.file(folder + "/" + filePath)
+            }
+        }
+    }
 }

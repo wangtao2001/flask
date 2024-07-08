@@ -67,4 +67,9 @@ public class Flask {
         let default =  this.addRouerGroup("/")
         default.post(path, handler)
     }
+
+    public func static_(path: String, folder: String) {
+        let default =  this.addRouerGroup("/")
+        default.static_(path, folder)
+    }
 }

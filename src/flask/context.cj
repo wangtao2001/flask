@@ -1,6 +1,7 @@
 package flask
 
 from net import http.HttpContext, http.HttpResponseBuilder
+from std import fs.File
 
 public class BaseContext {
     private let context: HttpContext
@@ -12,12 +13,26 @@ public class BaseContext {
         this.resp = context.responseBuilder
     }
 
-    public func string(str: String) {
+    public func string(str: String): Unit {
         this.resp.body(str)
     }
 
-    public func html(html: String) {
+    public func html(html: String): Unit {
         this.resp.header("content-type", "text/html; charset=utf-8").body(html)
+    }
+
+    public func file(path: String): Unit {
+        let allBytes: Array<UInt8> = File.readFrom(path)
+        let arr = path.split(".")
+        let fileType = arr[arr.size-1]
+        match(fileType) {
+            case "html" => this.resp.header("content-type", "text/html; charset=utf-8")
+            case "css" => this.resp.header("content-type", "text/css; charset=utf-8")
+            case "js" => this.resp.header("content-type", "text/javascript; charset=utf-8")
+            case "jpg" | "png" | "jpeg" => this.resp.header("content-type", "image/jpeg")
+            case _ => ""
+        }
+        this.resp.body(allBytes)
     }
 
     
@@ -26,10 +41,18 @@ public class BaseContext {
         for ((k,v) in this.context.request.headers.iterator()) {
             headers[k] = v
         }
-        return headers
+        headers
     }
 
-    public func addHeaders(k: String, v: String) {
+    public func getRequestMethod(): String {
+        this.context.request.method
+    }
+
+    public func getRequestPath(): String {
+        this.context.request.url.path
+    }
+
+    public func addHeaders(k: String, v: String): Unit {
         this.resp.header(k, v)
     }
 }
