@@ -35,7 +35,10 @@ public class BaseContext {
         this.resp.body(allBytes)
     }
 
-    
+    public func josn(): Unit {
+        
+    }
+
     public func getHeaders(): HashMap<String, Collection<String>> {
         let headers = HashMap<String, Collection<String>>()
         for ((k,v) in this.context.request.headers.iterator()) {

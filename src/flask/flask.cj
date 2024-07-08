@@ -12,7 +12,7 @@ public class Flask {
         println("listening on http://${addr}:${port}")
     }
 
-    public func addRouerGroup(perfix: String) {
+    public func addRouterGroup(perfix: String) {
         return this.router.addRouterGroup(perfix)
     }
 
@@ -59,17 +59,17 @@ public class Flask {
     }
 
     public func get(path: String, handler: Handler) {
-        let default = this.addRouerGroup("/")
+        let default = this.addRouterGroup("/")
         default.get(path, handler)
     }
 
     public func post(path: String, handler: Handler) {
-        let default =  this.addRouerGroup("/")
+        let default =  this.addRouterGroup("/")
         default.post(path, handler)
     }
 
     public func static_(path: String, folder: String) {
-        let default =  this.addRouerGroup("/")
+        let default =  this.addRouterGroup("/")
         default.static_(path, folder)
     }
 }
