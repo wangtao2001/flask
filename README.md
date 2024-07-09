@@ -23,7 +23,7 @@ cjpm run
 
 ##### 2. 作为三方库使用
 
-将 `cjpm.toml` 中 output-type 字段修改为 "static" 或 "dynamic" 并在你的项目中引用
+将 `cjpm.toml` 中 output-type 字段修改为 "static" 或 "dynamic" 并在项目中引用
 
 ### 使用示例
 
@@ -36,7 +36,7 @@ main(): Unit {
     # 绑定路由及处理函数
     app.get("/") {
         context =>
-        context.file("static/index.html")
+        context.file("dist/index.html")
     }
     # 路由分组
     let user = app.addRouterGroup("/user")

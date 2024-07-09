@@ -2,6 +2,8 @@ package flask
 
 from net import http.HttpContext, http.HttpResponseBuilder
 from std import fs.File
+from serialization import serialization.Serializable
+from encoding import json.*
 
 public class BaseContext {
     private let context: HttpContext
@@ -35,8 +37,8 @@ public class BaseContext {
         this.resp.body(allBytes)
     }
 
-    public func josn(): Unit {
-        
+    public func json<T>(data: T) where T<:  Serializable<T> {
+        this.resp.header("content-type", "text/json; charset=utf-8").body(data.serialize().toJson().asObject().toJsonString())
     }
 
     public func getHeaders(): HashMap<String, Collection<String>> {
